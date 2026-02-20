@@ -5,6 +5,7 @@
     <xacro:arg name="use_fake_hardware" default="false"/>
     <xacro:arg name="use_orientation" default="false"/>
     <xacro:arg name="use_clutch" default="false"/>
+    <xacro:arg name="auto_calibration" default="false"/>
 
     <!-- Import interface urdf file -->
     <xacro:include filename="$(find fd_description)/urdf/fd.urdf.xacro"/>
@@ -27,6 +28,7 @@
         use_clutch="$(arg use_clutch)"
         emulate_button="true"
         effector_mass="-1.0"
+        auto_calibrate="$(arg auto_calibration)"
     />
 
     <!-- Default effector masses:

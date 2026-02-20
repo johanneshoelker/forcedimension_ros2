@@ -74,6 +74,9 @@ private:
   // If true, the reading will emulate an omega 3 interface
   bool ignore_orientation_ = false;
 
+  // If true, the device will be auto-calibrated on connect
+  bool auto_calibrate_ = false;
+
   /// Interface mass in Kg, not used if negative
   double effector_mass_ = -1.0;
 

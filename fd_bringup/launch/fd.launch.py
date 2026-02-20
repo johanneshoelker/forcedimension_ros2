@@ -29,6 +29,7 @@ def generate_launch_description():
     use_fake_hardware = LaunchConfiguration('use_fake_hardware')
     use_orientation = LaunchConfiguration('use_orientation')
     use_clutch = LaunchConfiguration('use_clutch')
+    auto_calibration = LaunchConfiguration('auto_calibration')
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -45,6 +46,7 @@ def generate_launch_description():
             ' use_fake_hardware:=', use_fake_hardware,
             ' use_orientation:=', use_orientation,
             ' use_clutch:=', use_clutch,
+            ' auto_calibration:=', auto_calibration,
         ]
     )
     robot_description = \
@@ -132,4 +134,8 @@ def generate_launch_description():
             'use_clutch',
             default_value='false',
             description='Enable clutch (read pos/vel/force and write force)'),
-        ] + nodes)
+        DeclareLaunchArgument(
+         'auto_calibration',
+         default_value='false',
+         description='Enable automatic calibration at startup'),
+        ]+ nodes)

@@ -187,6 +187,14 @@ CallbackReturn FDEffortHardwareInterface::on_init(
   }
   RCLCPP_INFO(LOGGER, "Emulating button: %s", emulate_button_ ? "true" : "false");
 
+  auto it_auto_calibrate = info_.hardware_parameters.find("auto_calibrate");
+  if (it_auto_calibrate != info_.hardware_parameters.end()) {
+    auto_calibrate_ = hardware_interface::parse_bool(it_auto_calibrate->second);
+  } else {
+    auto_calibrate_ = false;
+  }
+  RCLCPP_INFO(LOGGER, "Auto-calibrate on connect: %s", auto_calibrate_ ? "true" : "false");
+
   auto it_fd_inertia = info_.hardware_parameters.find("inertia_interface_name");
   if (it_fd_inertia != info_.hardware_parameters.end()) {
     inertia_interface_name_ = it_fd_inertia->second;
@@ -514,6 +522,24 @@ bool FDEffortHardwareInterface::connectToDevice()
     }
     RCLCPP_INFO(LOGGER, "dhd : device interface ID = %d", interface_ID_);
 
+    // Calibrate the device if needed
+    if (auto_calibrate_) {
+      RCLCPP_INFO(LOGGER, "drd : Running automatic calibration. Please wait...");
+
+      if (drdOpenID(interface_ID_) < 0) {
+        RCLCPP_WARN(LOGGER,
+          "drd : drdOpenID() failed, skipping auto-init: %s", drdErrorGetLastStr());
+      } else {
+        if (drdAutoInit() < 0) {
+          RCLCPP_WARN(LOGGER,
+            "drd : drdAutoInit() failed (non-fatal): %s", drdErrorGetLastStr());
+        } else {
+          RCLCPP_INFO(LOGGER, "drd : Automatic initialization complete.");
+        }
+        drdStop(true);
+      }
+    }
+
     // Check if the device has 3 dof or more
     if (dhdHasWrist(interface_ID_)) {
       RCLCPP_INFO(LOGGER, "dhd : Rotation supported");
@@ -547,7 +573,7 @@ bool FDEffortHardwareInterface::connectToDevice()
     if (effector_mass_ > 0.0) {
       RCLCPP_INFO(
         LOGGER,
-        "dhd : Changing effector mass from %fto %f (g)!",
+        "dhd : Changing effector mass from %f to %f (g)!",
         current_effector_mass * 1000.0,
         effector_mass_ * 1000.0);
       if (dhdSetEffectorMass(effector_mass_, interface_ID_) < DHD_NO_ERROR) {
