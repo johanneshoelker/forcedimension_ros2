@@ -528,11 +528,11 @@ bool FDEffortHardwareInterface::connectToDevice()
 
       if (drdOpenID(interface_ID_) < 0) {
         RCLCPP_WARN(LOGGER,
-          "drd : drdOpenID() failed, skipping auto-init: %s", drdErrorGetLastStr());
+          "drd : drdOpenID() failed, skipping auto-init: %s", dhdErrorGetLastStr());
       } else {
         if (drdAutoInit() < 0) {
           RCLCPP_WARN(LOGGER,
-            "drd : drdAutoInit() failed (non-fatal): %s", drdErrorGetLastStr());
+            "drd : drdAutoInit() failed (non-fatal): %s", dhdErrorGetLastStr());
         } else {
           RCLCPP_INFO(LOGGER, "drd : Automatic initialization complete.");
         }
